@@ -10,7 +10,7 @@ import {createOrderController,
 import isAdmin from "../middlewares/auth.middleware.js";
 router.post("/create-order",createOrderController);
 router.get("/fetch-all-order",isAdmin,fetchAllOrdersController);
-router.get("/fetch-order",fetchAOrderUsingQuery); // getting error
+router.get("/fetch-order-query",fetchAOrderUsingQuery); // getting error
 router.get("/fetch-order-by-params/:uid",fetchOrderUsingParams); // getting error
 router.get("/fetch-order",fetchOrder); // getting error
 router.patch("/update-order/:uid",updateController);
