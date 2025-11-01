@@ -5,13 +5,17 @@ import {createOrderController,
         fetchAOrderUsingQuery,
         fetchOrderUsingParams,
         fetchOrder,
-        updateController
+        updateController,
+        deleteOrderByQueryController
     } from "../controllers/order.controller.js";
 import isAdmin from "../middlewares/auth.middleware.js";
 router.post("/create-order",createOrderController);
 router.get("/fetch-all-order",isAdmin,fetchAllOrdersController);
-router.get("/fetch-order-query",fetchAOrderUsingQuery); // getting error
-router.get("/fetch-order-by-params/:uid",fetchOrderUsingParams); // getting error
-router.get("/fetch-order",fetchOrder); // getting error
+router.get("/fetch-order-query",fetchAOrderUsingQuery); 
+router.get("/fetch-order-by-params/:oid",fetchOrderUsingParams); 
+router.get("/fetch-order",fetchOrder); 
 router.patch("/update-order/:uid",updateController);
+
+router.delete("/delete-a-order",deleteOrderByQueryController);
+
 export default router;

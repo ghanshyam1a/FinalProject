@@ -45,7 +45,7 @@ const createOrderController = async(req,res)=>{
 const fetchAllOrdersController = async (req,res) =>{
     try {
         const noOfOrder = await Order.countDocuments();
-        const orders = await Order.find();
+        const orders = await Order.find().populate("product").populate("user");
 
         return res.status(200).json({
             success:true,
@@ -67,14 +67,14 @@ const fetchAllOrdersController = async (req,res) =>{
 
 const fetchAOrderUsingQuery = async(req,res) =>{
     try {
-    const {uid} = req.query;
-    if(!uid){
+    const {fetchOrderUsingParams} = req.query;
+    if(!oid){
         return res.status(404).json({
             success:false,
             message:"uid did not found",
         });
     }      
-    const order = await Order.findById(uid);
+    const order = await Order.findById(oid).populate("product").populate("user");
     if(!order){
         return res.status(404).json({
             success:false,
@@ -95,20 +95,29 @@ const fetchAOrderUsingQuery = async(req,res) =>{
             err:err.message,
         });
     }
-};        // getting error
+};        
 
 //fetch a order using params
 
 const fetchOrderUsingParams = async(req,res) =>{
     try {
-        const { uid } = req.params;
-        const order = await Order.findById(uid);
+        const { oid } = req.params;
+        if(!oid){
+            return res.status(400).json({
+                success:false,
+                message:"oid is required",
+            });
+        }
+
+        const order = await Order.findById(oid).populate("product").populate("user");
+
         if(!order){
             return res.status(404).json({
                 success:false,
                 message:"Order did not found",
             });
         }
+
         return res.status(200).json({
             success:true,
             message:"order has founded",
@@ -122,20 +131,24 @@ const fetchOrderUsingParams = async(req,res) =>{
             err:err.message,
         });
     }
-};                // getting order
-
+};                
 // fetch a order without params and query
 
 const fetchOrder = async(req,res) =>{
+
     try {
+
         const {product, user} = req.body;
+
         if(!product && !user){
             return res.status(404).json({
                 success:false,
                 message:"product or user id required",
             });
         }
-        const order = await Order.findOne({product,user});
+
+        const order = await Order.findOne({product,user}).populate("product").populate("user");
+
         if(!order){
             return res.status(404).json({
                 success:false,
@@ -162,13 +175,13 @@ const fetchOrder = async(req,res) =>{
 
 const updateController  = async(req,res) =>{
     try {
-        const {uid} = req.params;
+        const {oid} = req.params;
         const {product,user} = req.body;
 
-        if(!uid){
+        if(!oid){
             return res.status(400).json({
                 success:false,
-                message:"User id is required",
+                message:"oid is required",
             });
         }
 
@@ -205,4 +218,39 @@ const updateController  = async(req,res) =>{
         });
     }
 };
-export {createOrderController,fetchAllOrdersController,fetchAOrderUsingQuery,fetchOrderUsingParams,fetchOrder,updateController};
+
+// delete controller using query 
+const deleteOrderByQueryController = async(req,res) =>{
+    try {
+        const {oid} = req.query;
+        if(!oid){
+            return res.status(400).json({
+                success:false,
+                message:"oid is required",
+            });
+        }
+
+        await Order.findByIdAndDelete(oid);
+
+        return res.status(200).json({
+            success:true,
+            message:"order details deleted successfully",
+        });
+
+    } catch (err) {
+        return res.status(500).json({
+            success:false,
+            message:"Server Error",
+            err:err.message,
+        });
+    }
+};
+export {
+    createOrderController,
+    fetchAllOrdersController,
+    fetchAOrderUsingQuery,
+    fetchOrderUsingParams,
+    fetchOrder,
+    updateController,
+    deleteOrderByQueryController
+};
