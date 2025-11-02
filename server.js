@@ -32,7 +32,7 @@ app.use(
        credentials:true,
       })
     );
-    
+
 app.use(async(req,res,next) =>{
     try {
         await connection();
