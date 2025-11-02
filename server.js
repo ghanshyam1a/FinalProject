@@ -3,13 +3,13 @@ import dotenv from "dotenv";
 import connection from "./config/db.js";
 import colors from "colors";
 import morgan from "morgan";
-
+import cors from "cors";
 import connectDB from "./config/db.js";
 import userRoutes from "./routes/user.route.js";
 import productRoutes from "./routes/product.route.js";
 import orderRoutes from "./routes/order.route.js";
 import cookieParser from 'cookie-parser';
-import cors from "cors";
+
 
 // express initialization
 const app = express();
@@ -19,8 +19,6 @@ dotenv.config();
 
 //const PORT = process.env.PORT || 8100;
 
-// Connect db
-//connectDB();
 
 //start the connection
 connection();
@@ -83,6 +81,4 @@ app.get("/fetch-something",(req,res) =>{
 });
 
 export default app;
-
-//module.exports = app;
 

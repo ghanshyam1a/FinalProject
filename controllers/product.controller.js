@@ -53,7 +53,7 @@ const createProductController = async(req,res) => {
 const fetchAllProduct = async(req,res) =>{
     try {
 
-        // // check admin via token manually
+        //  check admin via token manually
         
         // const authToken = req.cookies?.authToken;
         // if(!authToken){
@@ -167,7 +167,7 @@ const fetchProductUsingParams = async(req,res) =>{
             err:err.message,
         });
     }
-}; // getting error
+}; 
 
 // fetch a one user without query or params
 
