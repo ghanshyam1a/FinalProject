@@ -23,7 +23,7 @@ dotenv.config();
 //connectDB();
 
 //start the connection
-//connection();
+connection();
 
 //middlewares
 app.use(
@@ -32,14 +32,7 @@ app.use(
        credentials:true,
       })
     );
-
-app.use(express.json());
-app.use(morgan());
-app.use(express.urlencoded({extended:true}));
-app.use(cookieParser());
-
-// DB connection middleware (ensure DB is connected before router)
-
+    
 app.use(async(req,res,next) =>{
     try {
         await connection();
@@ -48,6 +41,15 @@ app.use(async(req,res,next) =>{
         next(err);
     }
 });
+
+app.use(express.json());
+app.use(morgan());
+app.use(express.urlencoded({extended:true}));
+app.use(cookieParser());
+
+// DB connection middleware (ensure DB is connected before router)
+
+
 
 app.use(process.env.API_VERSION,userRoutes);
 app.use(process.env.API_VERSION,productRoutes);
