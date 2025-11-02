@@ -84,9 +84,3 @@ export default app;
 
 //module.exports = app;
 
-// PORT listening
-
-// app.listen(PORT,() =>{
-//     console.log(colors.bgYellow(`The server is running on port no:${PORT}`));
-// });
-

@@ -16,7 +16,6 @@
 
 // export default connection;
 
-//import mongoose, { connection, mongo } from "mongoose";
 import mongoose from "mongoose";
 import colors from "colors";
 
