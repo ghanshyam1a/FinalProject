@@ -8,8 +8,11 @@ dotenv.config();
 
 // Registeration controller
 const registerController = async(req,res) =>{
+
     console.log(req.files);
+
     const {email,password} = req.body;
+
     try {
         
     // user id and password is required for registration
@@ -30,7 +33,9 @@ const registerController = async(req,res) =>{
 
     // check if user is already register or not
     const user = await User.findOne({email});
+
     // if user founded
+
     if(user){
         return res.status(409).json({
             success:false,
@@ -40,6 +45,7 @@ const registerController = async(req,res) =>{
 
     // encrypting the password 
     const saltRounds =10;
+
     const hashedPassword = await bcrypt.hash(password,saltRounds);
 
     // initiate a new user and save it to the Database
@@ -51,6 +57,7 @@ const registerController = async(req,res) =>{
     }).save();
 
     const subject = "Registration Email";
+
     const msg = `<h1>Welcome to Busy Store</h1><p>Thank your resitering to your service</p><a style="background-color: lime; padding: 5px 10px; border-radius: 10px" href="https://youtube.com">Login now</a>`;
 
 
@@ -62,6 +69,7 @@ const registerController = async(req,res) =>{
             message:"User has registered successfully",
             data:newUser,
         });
+
     } catch (err) {
         return res.status(500).json({
             success:false,
@@ -75,13 +83,16 @@ const registerController = async(req,res) =>{
 const loginController = async(req,res) =>{
     
     try {
-        const {email , password} = req.body;
+
+        const { email , password } = req.body;
+
         if(!email){
             return res.status(400).json({
                 success:false,
                 message:"Email is required",
             });
         }
+
         if(!password){
             return res.status(400).json({
                 success:false,
@@ -90,13 +101,16 @@ const loginController = async(req,res) =>{
         }
 
         const user = await User.findOne({email});
+
         if(!user){
             return res.status(404).json({
                 success:false,
                 message:"User not found",
             });
         }
+
         const isMatch = await bcrypt.compare(password,user.password);
+
         if(!isMatch){
             return res.status(401).json({
                 success:false,
@@ -122,17 +136,21 @@ const loginController = async(req,res) =>{
             maxAge: 24 * 60 * 60 * 1000,
             path:"/",
         });
+
         // authorization .......
         // saving the user in the request object for isAdmin middleware access
 
         req.user = userDetails;
 
-        const subject = "LogIn Email";
-        const msg = `<h1>Welcome to Busy Store</h1><p>Thank your Log In on our service</h1>`;
+        const subject = "User Login Email";
 
+        const msg = `<h1>Welcome to Busy Store</h1><p>Thank your Login on our site</p><a style="background-color: lime; padding: 5px 10px; border-radius: 10px" href="https://youtube.com">Login now</a>`;
+
+
+        // send email to registration user
+
+        sendEmail(subject,msg,userDetails.email);
     
-    // send email to registration user
-    sendEmail(subject,msg,userDetails.email);
 
         return res.status(200).json({
             success:true,
@@ -151,6 +169,7 @@ const loginController = async(req,res) =>{
 
 // log out controller
 const logoutController = async(req,res)=>{
+
     try {
         res.clearCookie("authToken",{
             httpOnly:process.env.COOKIE_HTTPONLY,
@@ -162,6 +181,7 @@ const logoutController = async(req,res)=>{
             success:true,
             message:"user logged out successfully",
         });
+
     } catch (err) {
         return res.status(500).json({
             success:false,
@@ -173,14 +193,18 @@ const logoutController = async(req,res)=>{
 
 // fetchAllUser
 const fetchAllUserController = async(req,res)=>{
+
     try {
 
         // pagination 
         const page = parseInt(req.query.page); //1
+
         const limit = parseInt(req.query.limit); //10
+
         const skip = (page-1) * limit;
         
         const noOfUsers = await User.countDocuments();
+
         const users = await User.find()
         .limit(limit)
         .skip(skip)
@@ -207,6 +231,7 @@ const fetchAllUserController = async(req,res)=>{
                 hasPrevPage: page > 1,
             }
         });
+
     } catch (err) {
         return res.status(500).json({
             success:false,
@@ -218,8 +243,10 @@ const fetchAllUserController = async(req,res)=>{
 
 // fetch a user using by ID
 const fetchAUserBYID =async(req,res) =>{
+
     try {
         const { uid } = req.params;
+
         const user = await User.findById(uid);
 
         if(!user){
@@ -234,6 +261,7 @@ const fetchAUserBYID =async(req,res) =>{
             message:"User has founded by ID",
             data:user,
         });
+
     } catch (err) {
         return res.status(500).json({
             success:false,
@@ -245,8 +273,11 @@ const fetchAUserBYID =async(req,res) =>{
 
 // fetch a user with query
 const fetchAUserWithQuery = async(req,res) =>{
+
     try {
-    const {uid } = req.query;
+
+    const { uid } = req.query;
+
     const user = await User.findById(uid);
 
     if(!user){
@@ -261,6 +292,7 @@ const fetchAUserWithQuery = async(req,res) =>{
         message:"user founded",
         data:user,
     });
+
     } catch (err) {
         return res.status(500).json({
             success:false,
@@ -272,8 +304,11 @@ const fetchAUserWithQuery = async(req,res) =>{
 
 // fetch a user without details
 const fetchUserWithoutDetails = async(req,res)=>{
+
     try {
+
         const {email} = req.body;
+
         const user = await User.findOne({email});  
         
         if(!user){
@@ -301,7 +336,9 @@ const fetchUserWithoutDetails = async(req,res)=>{
 // update a user 
 const updateController = async(req,res) =>{
     try {
+
     const { uid } = req.params;
+
     const {password} = req.body;
 
     if(!password){
@@ -312,14 +349,17 @@ const updateController = async(req,res) =>{
     }
 
     const saltRounds =10;
+
     const hashedPassword = await bcrypt.hash(password,saltRounds);
 
     const user = await User.findByIdAndUpdate(uid,{
         password:hashedPassword,
     },
+
     {
         new:true,
     }
+
 );
 
     if(!user){
@@ -331,12 +371,12 @@ const updateController = async(req,res) =>{
     }
 
     
-    //     const subject = "details updated Email";
-    //     const msg = `<h1>Welcome to Busy Store</h1><p>Thank you user details updated</h1>`;
+        const subject = "details updated Email";
+        const msg = `Thank you user details updated`;
 
     
-    // // send email to registration user
-    // sendEmail(subject,msg,user.email);
+    // send email to registration user
+     sendEmail(subject,msg,user.email);
 
     return res.status(200).json({
         success:true,
@@ -355,21 +395,25 @@ const updateController = async(req,res) =>{
 
 // delete a user
 const deleteOneUser = async(req,res)=>{
+
     try {
         const {email} = req.body;
+
         if(!email) {
             return res.status(400).json({
                 success:false,
                 message:"email is required",
             });
         }
+
         const user = await User.deleteOne();
 
         return res.status(200).json({
             success:true,
             message:"user has deleted",
         });
-    } catch (err) {
+} 
+    catch (err) {
         return res.status(500).json({
             success:false,
             message:"Server Error",
@@ -380,7 +424,9 @@ const deleteOneUser = async(req,res)=>{
 
 // delete a user using params
 const deleteUserById = async(req,res)=>{
+
     try {
+
     const {uid} = req.query;
     
     if(!uid){
@@ -396,7 +442,8 @@ const deleteUserById = async(req,res)=>{
         success:true,
         message:"user deleted",
     });
-    } catch (err) {
+}
+     catch (err) {
         return res.status(500).json({
             success:false,
             message:"Server Error",
@@ -404,6 +451,15 @@ const deleteUserById = async(req,res)=>{
     }
 };
 
-export {registerController,loginController,fetchAllUserController,fetchAUserBYID,fetchAUserWithQuery,fetchUserWithoutDetails,
-    updateController,deleteOneUser,deleteUserById,logoutController
-};
+export {
+        registerController,
+        loginController,
+        fetchAllUserController,
+        fetchAUserBYID,
+        fetchAUserWithQuery,
+        fetchUserWithoutDetails,
+        updateController,
+        deleteOneUser,
+        deleteUserById,
+        logoutController
+    };
